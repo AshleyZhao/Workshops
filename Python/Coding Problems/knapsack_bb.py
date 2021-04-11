@@ -45,17 +45,23 @@ def GFC(take_list):
     greed_value = 0
 
     temp_capacity = c
+    
+    # keeps track of the take_list
+    n = 0
 
     # if we can take the whole item, we take it
     # otherwise we take whatever unit is left
 
     for item in items:
-        if item.mass <= temp_capacity:
+        if item.mass <= temp_capacity and take_list[n] != 0:
             greed_value += item.value
             temp_capacity -= item.mass
-        else:
+        elif item.mass > temp_capacity and take_list[n] != 0:
             greed_value += (item.unit_value * temp_capacity)
             temp_capacity = 0
+        else:
+            return -1
+        n += 1
     return (total_value - greed_value)
 
 # Helper function to find FFC
@@ -66,18 +72,24 @@ def FFC(take_list):
 
     temp_capacity = c
 
+    n = 0
+
     # if we can take the whole item, we take it
     # otherwise we leave it
 
     for item in items:
-        if item.mass <= temp_capacity:
+        if item.mass <= temp_capacity and take_list[n] != 0:
             greed_value += item.value
             temp_capacity -= item.mass
+        elif item.mass > temp_capacity and take_list[n] == 1:
+            return -1
+
+        n += 1
 
     return (total_value - greed_value)
 
-# print(GFC(items[2:]))
-# print(FFC(items))
+print(GFC([None]*len(items)))
+print(FFC([None]*len(items)))
 
 # print(x)
 
