@@ -56,7 +56,7 @@ def GFC(items, mass=c):
         else:
             greed_value += (item.unit_value * temp_capacity)
             temp_capacity = 0
-    return (total_value - greed_value)
+    return greed_value
 
 # Helper function to find FFC
 # Just the greedy problem 
@@ -74,17 +74,17 @@ def FFC(items, mass=c):
             greed_value += item.value
             temp_capacity -= item.mass
 
-    return (total_value - greed_value)
+    return greed_value
 
 # print(GFC(items[2:]))
 # print(FFC(items))
 
 # print(x)
 
-l_global = GFC(items)
-u_global = FFC(items)
+l_global = total_value - GFC(items)
+u_global = total_value - FFC(items)
 
-# print(u_global, l_global)
+print(u_global, l_global)
 root = Node([None] * len(items))
 
 root.left = Node([0] + [None] * (len(items)-1))
@@ -133,62 +133,58 @@ while (n < len(items)):
 
     for p in P:
 
-        temp_left = p.data[:]
-        temp_left[n] = 0
-        p.left = Node(temp_left)
+        print("p.data", p.data)
 
         # taken_list = p.left.data[:n]
 
         # We check if this solution is actually viable:
-        mass = p.left.data[:n+1]
-        for i in range(0,n+1):
+        mass = p.data[:n]
+        for i in range(0,n):
             mass[i] = mass[i] * items[i].mass
 
         mass = sum(mass)
+        print("mass ",mass)
         
         # If the solution is actually viable, we calculate lq and uq
         if mass <= c:
             # We need CSF + GFC for lq
-            CSF = p.left.data[:n+1]
-            print(CSF)
-            for i in range(0,n+1):
+            CSF = p.data[:n]
+            for i in range(0,n):
                 CSF[i] = CSF[i] * items[i].value
             CSF = sum(CSF)
-            print("CSF",CSF)
+            print("CSF ",CSF)
 
-            # print(p.left.data)
+            print("n",n)
+            gfc = GFC(items[n:],c-mass)
+            ffc = FFC(items[n:],c-mass)
 
-            gfc = GFC(items[n+1:],c-mass)
-            ffc = FFC(items[n+1:],c-mass)
+            print("GFC ",gfc)
+            print("FFC ",ffc)
 
-            print("n+1", n+1)
+            lq = total_value - gfc - CSF
+            uq = total_value - ffc - CSF
 
-            print("printing items")
-            for item in items[n+1:]:
-                print(item.value)
-            print("gfc, ",gfc)
+            print("lq ",lq)
+            print("uq ",uq)
 
-            lq = CSF + gfc
-            uq = CSF + ffc
-
-            print("lower bound",lq)
-            print("upper bound",uq)
-            print("u_global",u_global)
-
-            # Then we only get the solution if its lq is smaller than u_global
-            if lq < u_global:
+            # Then we only continue down left and right with the solution if its lq is smaller than u_global
+            if lq <= u_global:
                 # also update u_global if uq is smaller
                 if uq < u_global:
                     u_global = uq
                 
+                temp_left = p.data[:]
+                temp_left[n] = 0
+                p.left = Node(temp_left)
                 temp_P.append(p.left)
 
-        #temp_right = p.data[:]
-        #temp_right[n] = 1
-        #p.right = Node(temp_right)
-        #temp_P.append(p.right)
+                temp_right = p.data[:]
+                temp_right[n] = 1
+                p.right = Node(temp_right)
+                temp_P.append(p.right)
 
-    P = temp_P
+    print("updated u_global ", u_global)
+    P = temp_P[:]
     n += 1
 
 for p in P:
