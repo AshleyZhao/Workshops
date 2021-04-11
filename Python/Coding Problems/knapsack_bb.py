@@ -168,20 +168,20 @@ while (n < len(items)):
             print("uq ",uq)
 
             # Then we only continue down left and right with the solution if its lq is smaller than u_global
-            if lq <= u_global:
+            if uq <= u_global:
+                u_global = uq
                 # also update u_global if uq is smaller
-                if uq < u_global:
-                    u_global = uq
+                if lq <= u_global:
                 
-                temp_left = p.data[:]
-                temp_left[n] = 0
-                p.left = Node(temp_left)
-                temp_P.append(p.left)
+                    temp_left = p.data[:]
+                    temp_left[n] = 0
+                    p.left = Node(temp_left)
+                    temp_P.append(p.left)
 
-                temp_right = p.data[:]
-                temp_right[n] = 1
-                p.right = Node(temp_right)
-                temp_P.append(p.right)
+                    temp_right = p.data[:]
+                    temp_right[n] = 1
+                    p.right = Node(temp_right)
+                    temp_P.append(p.right)
 
     print("updated u_global ", u_global)
     P = temp_P[:]
